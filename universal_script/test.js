@@ -1,11 +1,10 @@
 
-
 //消失
 function googleOpenTk() {
     app.launch("com.android.chrome")
     for (let i = 0; i < 20; i++) {
         if (i == 19) {
-            comm.showLog("打开Tk失败")
+            comm.showLog("打开Tk失败了")
         }
         //浏览器url栏已输入tk链接
         let line_one = selector().textContains("www.tiktok.com").visibleToUser(true).findOne(1000);
