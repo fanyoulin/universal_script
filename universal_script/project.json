@@ -1,0 +1,32 @@
+{
+  "assets": [],
+  "build": {
+    "build_id": "00DD5673-3",
+    "build_number": 3,
+    "build_time": 1730709473761,
+    "release": false
+  },
+  "encryptLevel": 0,
+  "useFeatures": [],
+  "launchConfig": {
+    "displaySplash": false,
+    "hideLogs": true,
+    "splashText": "Powered by Auto.js Pro",
+    "stableMode": true
+  },
+  "main": "app.js",
+  "name": "vpn录入",
+  "optimization": {
+    "removeOpenCv": true,
+    "unusedResources": true
+  },
+  "packageName": "com.kjfb.vpnKitsunebi",
+  "scripts": {},
+  "signingConfig": {
+    "alias": "241572",
+    "keystore": "/storage/emulated/0/Pictures/.keystore/vpnKitsunebi.jks",
+    "uuid": "9e8d53d4-0950-4be6-ae9f-30e455cf10f2"
+  },
+  "versionCode": 1,
+  "versionName": "1.0.0"
+}
