@@ -1,6 +1,6 @@
 
 
-//123  ds
+//123  ds  ddd
 function googleOpenTk() {
     app.launch("com.android.chrome")
     for (let i = 0; i < 20; i++) {
