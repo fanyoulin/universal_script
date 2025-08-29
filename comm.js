@@ -56,7 +56,7 @@ comm.clickObj = function (o) {
     }
     try {
         let b = o.bounds()
-        console.log('comm.clickObj:'+o.text() +','+ b.centerX() + ',' + b.centerY())
+        console.log('comm.clickObj:' + o.text() + ',' + b.centerX() + ',' + b.centerY())
         click(b.centerX(), b.centerY())
     } catch (error) {
         console.log(error)
@@ -218,7 +218,6 @@ comm.httpToString = function (url) {
     try {
         console.log(url)
         let response = http.get(url)
-        console.log(response);
         let responseString = response.body.string();
         console.log(responseString)
         // let taskJson=JSON.parse(responseString)
@@ -405,6 +404,13 @@ comm.randomSwipeToTop = function (num) {
         sleep(time)
     }
 }
+
+
+
+
+
+
+
 
 // // 滑块验证码
 // comm.sliderVerificationCode = function(text){

@@ -490,11 +490,84 @@ let password = "lU1eXJvnEG564";
 // boundsInside(0,0, device.width, device.height/3).className("android.widget.Button").clickable().visibleToUser(true).find().forEach(function(tv){
 //      log(tv);
 // });
-let ChooseWhatYouLike = selector().textContains('Choose what you like').visibleToUser(true).findOne(2000)
-    if (ChooseWhatYouLike) {
-        console.log("123");
-        
+
+
+
+/**
+ * 从按钮集合中筛选指定位置的控件
+ * @param {UiObject[]} buttons - 按钮控件数组
+ * @param {string} position - 位置参数：left|right|top|bottom|topLeft|topRight|bottomLeft|bottomRight
+ * @returns {UiObject|null} 返回匹配的控件或null
+ */
+function filterButtonByPosition(buttons, position) {
+    if (!buttons || buttons.length === 0) return null;
+
+    let result = buttons[0];
+    const boundsCache = buttons.map(btn => btn.bounds());
+
+    switch (position) {
+        case 'left':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].left < prev.bounds().left ? curr : prev);
+            break;
+        case 'right':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].right > prev.bounds().right ? curr : prev);
+            break;
+        case 'top':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].top < prev.bounds().top ? curr : prev);
+            break;
+        case 'bottom':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].bottom > prev.bounds().bottom ? curr : prev);
+            break;
+        case 'topLeft':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.left + currBounds.top) < (prevBounds.left + prevBounds.top)
+                    ? curr : prev;
+            });
+            break;
+        case 'topRight':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.right - currBounds.top) > (prevBounds.right - prevBounds.top)
+                    ? curr : prev;
+            });
+            break;
+        case 'bottomLeft':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.left - currBounds.bottom) < (prevBounds.left - prevBounds.bottom)
+                    ? curr : prev;
+            });
+            break;
+        case 'bottomRight':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.right + currBounds.bottom) > (prevBounds.right + prevBounds.bottom)
+                    ? curr : prev;
+            });
+            break;
+        default:
+            throw new Error('Invalid position parameter');
     }
+    return result;
+}
+
+let verifyInput = idContains("nmb").visibleToUser(true).findOne(60000)
+                if (verifyInput) {
+                    log(verifyInput)
+                }
+// log(filterButtonByPosition(btn, "bottom"))
+
+// console.log(idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000).childCount()); 
+
 
 
 

@@ -1056,6 +1056,8 @@ function AttemptOperation_Login(taskInfo) {
             return "账号不存在"
         } else if (returnMsg == '操作频繁') {
             return "操作频繁"
+        } else if (returnMsg.includes("登录警告")) {
+            return returnMsg
         } else {
             comm.showLog("如果第二次之后执行，先杀掉进程")
             httpShell('am force-stop com.zhiliaoapp.musically')
@@ -7568,7 +7570,7 @@ function tkInvitesActivitiesGetUrl(taskInfo) {
         sleep(5000)
         if (selector().textContains('Home').visibleToUser(true).findOne(1000) && selector().textContains('Profile').visibleToUser(true).findOne(1000)) {
             // if (selector().textContains('Home').visibleToUser(true).findOne(2000)){
-            comm.showLog('已经登陆进去了')
+            comm.showLog('已经登录进去了')
             break
         } else {
             // //判断是否出现需要登陆的情况
@@ -8141,7 +8143,7 @@ function untapePhoneNumber(taskInfo) {
         comm.showLog("判断是否已经进入tk...")
         if (selector().textContains('Home').visibleToUser(true).findOne(1000) && selector().textContains('Profile').visibleToUser(true).findOne(1000)) {
             // if (selector().textContains('Home').visibleToUser(true).findOne(2000)){
-            comm.showLog('已经登陆进去了')
+            comm.showLog('已经登录进去了')
             sleep(2000)
             // Please try again     Retry
             let pta = selector().textContains('Please try again').visibleToUser(true).exists()
@@ -8348,7 +8350,7 @@ function massSending(taskInfo) {
         comm.showLog("判断是否已经进入tk...")
         if (selector().textContains('Home').visibleToUser(true).findOne(1000) && selector().textContains('Profile').visibleToUser(true).findOne(1000)) {
             // if (selector().textContains('Home').visibleToUser(true).findOne(2000)){
-            comm.showLog('已经登陆进去了')
+            comm.showLog('已经登录进去了')
             sleep(2000)
             // Please try again     Retry
             let pta = selector().textContains('Please try again').visibleToUser(true).exists()
@@ -11582,89 +11584,125 @@ function login(email, username, loginType, password, code_url) {
         httpShell("pm grant com.zhiliaoapp.musically android.permission.POST_NOTIFICATIONS")
         sleep(3000)
         //
-        if (selector().textContains('Use passkey').visibleToUser(true).exists()) {
-            back()
+        // if (selector().textContains('Use passkey').visibleToUser(true).exists()) {
+        //     back()
+        //     sleep(3000)
+        // }
+
+        for (let i = 0; i < 3; i++) {
+            let sp = idContains("cr9").className("android.widget.TextView").clickable(false).visibleToUser(true).findOne(1000);
+            if (sp) {
+                if (sp && sp.text().indexOf("/") != -1) {
+                    comm.showLog("进入User phone/email/username")
+                    comm.clickObj(sp)
+                    sleep(3000)
+                } else {
+                    sp = idContains("v9w").clickable().className("android.widget.Button").visibleToUser(true).findOne(1000);
+                    if (sp) {
+                        comm.showLog("Login按钮")
+                        comm.clickObj(sp)
+                    }
+                }
+            } else {
+                let emailUsernameParent = idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000)
+                if (emailUsernameParent && emailUsernameParent.childCount() == 2) {
+                    break
+                }
+            }
+            sleep(1000)
+        }
+
+        sleep(3000)
+
+        // comm.showLog("登录的for--1")
+        // comm.httpToString(httpServer + '/api/ping?task_id=' + task_id)
+        // comm.showLog("判断birth是否存在")
+        // let birthday_msg = selector().textContains('birth').visibleToUser(true).exists()
+        // if (birthday_msg) {
+        //     comm.showLog("找到birthday")
+        //     sleep(2000)
+        //     let log_in_btn = selector().textContains("have an account").visibleToUser(true).findOne(1000)
+        //     //let log_in_btn=selector().textContains('Log in').findOne(3000) 
+        //     if (log_in_btn) {
+        //         comm.showLog("点击log_in_btn")
+        //         comm.clickObj(log_in_btn)
+        //     } else {
+        //         comm.showLog("进行生日选择")
+        //         let reSelectB = selectTkBirthday()
+        //         if (reSelectB) {
+        //             // 判断有没有Learn more
+        //             let continueBtn = selector().textContains("Continue").visibleToUser(true).findOne(1000)
+        //             if (continueBtn) {
+        //                 comm.showLog("选完生日,点击继续")
+        //                 comm.clickObj(continueBtn)
+        //             }
+        //         }
+        //     }
+        //     sleep(3000)
+        // }
+
+
+        comm.showLog("找Email/Username")
+        //找email/username的上上级控件,找到便点击它的第二个子控件,email/username的父控件
+        let clickEmailUsername = false
+        for (let i = 0; i < 10; i++) {
+            let emailUsernameParent = idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000)
+            if (emailUsernameParent && emailUsernameParent.childCount() == 2) {
+                if (emailUsernameParent.child(1).selected()) {
+                    comm.showLog("Email/Username已选中")
+                    clickEmailUsername = true
+                    break
+                }
+                comm.showLog("找到Email/Username并点击")
+                comm.clickObj(emailUsernameParent.child(1))
+            }
             sleep(3000)
         }
 
-        //存在Log in按钮
-        comm.showLog("找log-in按钮")
-        let log_in_btn = selector().textContains('Log in').visibleToUser(true).findOne(1000)
-        if (log_in_btn) {
-            comm.clickObj(log_in_btn)
-            sleep(3000)
-        }
-        //
-        if (selector().textContains('Use passkey').visibleToUser(true).exists()) {
-            back()
-            sleep(3000)
-        }
-        //
-        comm.showLog("登录的for--1")
-        comm.httpToString(httpServer + '/api/ping?task_id=' + task_id)
-        comm.showLog("判断birth是否存在")
-        let birthday_msg = selector().textContains('birth').visibleToUser(true).exists()
-        if (birthday_msg) {
-            comm.showLog("找到birthday")
-            sleep(2000)
-            let log_in_btn = selector().textContains("have an account").visibleToUser(true).findOne(1000)
-            //let log_in_btn=selector().textContains('Log in').findOne(3000) 
-            if (log_in_btn) {
-                comm.showLog("点击log_in_btn")
-                comm.clickObj(log_in_btn)
-            } else {
-                comm.showLog("进行生日选择")
-                let reSelectB = selectTkBirthday()
-                if (reSelectB) {
-                    // 判断有没有Learn more
-                    let continueBtn = selector().textContains("Continue").visibleToUser(true).findOne(1000)
-                    if (continueBtn) {
-                        comm.showLog("选完生日,点击继续")
-                        comm.clickObj(continueBtn)
-                    }
-                }
-            }
-            sleep(3000)
-        }
-        comm.showLog("登录的for--2")
-        comm.showLog("找Use phone")
-        let use_phone = selector().textContains('Use phone').visibleToUser(true).findOne(1000)
-        if (use_phone) {
-            comm.showLog("找到Use phone并点击")
-            comm.clickObj(use_phone)
-            sleep(2000)
-        }
-        comm.showLog("找Email/Username")
-        let usernameTextView = selector().textContains('Email / Username').visibleToUser(true).findOne(3000)
-        if (usernameTextView) {
-            comm.showLog("找到Email/Username并点击")
-            comm.clickObj(usernameTextView)
-            sleep(2000)
-            //
-            let inputsTest = selector().className('android.widget.EditText').find()
-            if (inputsTest.length < 1) {
-                comm.showLog("tk没启动:" + inputsTest.length)
-                return "tk没启动"
-            }
-            //如果有Save login info，则点击Save login info
-            // comm.showLog("找Save login info")
-            // let saveLoginInfo=selector().textContains('Save login info').findOne(3000)
-            // if(saveLoginInfo)
-            // {   
-            //     comm.showLog("点Save login info的那个按钮")
-            //     //comm.clickObj(saveLoginInfo)
-            //     click(149,2711)
-            //     // let saveChack = selector().className('android.widget.CheckBox').visibleToUser(true).findOne(1000)
-            //     // comm.clickObj(saveChack)
-            // }
+        if (clickEmailUsername) {
             break
         }
+
+        // comm.showLog("找Email/Username")
+        // let usernameTextView = selector().textContains('Email / Username').visibleToUser(true).findOne(3000)
+        // if (usernameTextView) {
+        //     comm.showLog("找到Email/Username并点击")
+        //     comm.clickObj(usernameTextView)
+        //     sleep(2000)
+        //     //
+        //     let inputsTest = selector().className('android.widget.EditText').find()
+        //     if (inputsTest.length < 1) {
+        //         comm.showLog("tk没启动:" + inputsTest.length)
+        //         return "tk没启动"
+        //     }
+        //     //如果有Save login info，则点击Save login info
+        //     // comm.showLog("找Save login info")
+        //     // let saveLoginInfo=selector().textContains('Save login info').findOne(3000)
+        //     // if(saveLoginInfo)
+        //     // {   
+        //     //     comm.showLog("点Save login info的那个按钮")
+        //     //     //comm.clickObj(saveLoginInfo)
+        //     //     click(149,2711)
+        //     //     // let saveChack = selector().className('android.widget.CheckBox').visibleToUser(true).findOne(1000)
+        //     //     // comm.clickObj(saveChack)
+        //     // }
+        //     break
+        // }
+
         comm.showLog("登录的for--3")
         //判断是不是在首页
-        if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-            comm.showLog('已经登陆进去了')
+        let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
+        let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+        if (isMainPage && myProfile) {
+            comm.showLog('已经登录进去了')
             return "success"
         }
+
+
+        // if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
+        //     comm.showLog('已经登录进去了')
+        //     return "success"
+        // }
         //
         // comm.showLog("登录的for--4")
         // if(currentPackage().indexOf('com.zhiliaoapp.musically')==-1){
@@ -11680,11 +11718,13 @@ function login(email, username, loginType, password, code_url) {
     //第二步 用户名密码登录
     comm.showLog("第二步 用户名密码或邮箱登录")
     if (loginType == 1) {
+
         let inputs = selector().className('android.widget.EditText').find()
         if (inputs) {
             httpShell('am force-stop com.google.android.inputmethod.latin')
             inputs[1].setText(username)
         }
+
         sleep(2000)
         let saveChack = selector().className('android.widget.CheckBox').visibleToUser(true).findOne(1000)
         if (saveChack) {
@@ -11693,15 +11733,23 @@ function login(email, username, loginType, password, code_url) {
             }
         }
         sleep(2000)
-        let continueBtn = selector().textContains('Continue').visibleToUser(true).findOne(2000)
+
+        let btn = className("android.widget.Button").visibleToUser(true).clickable().find()
+        let continueBtn = filterButtonByPosition(btn, "bottom")
         if (continueBtn) {
-            if (continueBtn.text() != "Continue") {
-                return "没正确执行"
-            } else {
-                comm.clickObj(continueBtn)
-                sleep(5000)
-            }
+            comm.clickObj(continueBtn)
         }
+
+
+        // let continueBtn = selector().textContains('Continue').visibleToUser(true).findOne(2000)
+        // if (continueBtn) {
+        //     if (continueBtn.text() != "Continue") {
+        //         return "没正确执行"
+        //     } else {
+        //         comm.clickObj(continueBtn)
+        //         sleep(5000)
+        //     }
+        // }
 
         for (let i = 0; i < 8; i++) {
             if (!selector().textContains(username).visibleToUser(true).findOne(2000)) {
@@ -11731,42 +11779,50 @@ function login(email, username, loginType, password, code_url) {
         }
         sleep(2000)
         //
-        let continueBtn = selector().textContains('Continue').visibleToUser(true).findOne(2000)
+        let btn = className("android.widget.Button").visibleToUser(true).clickable().find()
+        let continueBtn = filterButtonByPosition(btn, "bottom")
         if (continueBtn) {
-            if (continueBtn.text() != "Continue") {
-                return "没正确执行"
-            } else {
-                comm.clickObj(continueBtn)
-                sleep(3000)
-            }
+            comm.clickObj(continueBtn)
         }
         //
         sleep(2000)
         comm.showLog("找Account doesn't exist")
         //let accNoExist = selector().textContains("Account doesn't exist").visibleToUser(true).exists()
-        let accNoExist = selector().textContains("Account doesn").visibleToUser(true).exists()
-
-        if (accNoExist) {
-            return "账号不存在"
-        } else {
-            comm.showLog("没找到Account doesn't exist")
-        }
+        // let accNoExist = selector().textContains("Account doesn").visibleToUser(true).exists()
+        // if (accNoExist) {
+        //     return "账号不存在"
+        // } else {
+        //     comm.showLog("没找到Account doesn't exist")
+        // }
 
         comm.showLog("找Maximum number")
-        let maxRetry = selector().textContains("Maximum number").visibleToUser(true).exists()
-        if (maxRetry) {
-            return "操作频繁"
-        } else {
-            comm.showLog("没找到AMaximum number")
+        // let maxRetry = selector().textContains("Maximum number").visibleToUser(true).exists()
+        // if (maxRetry) {
+        //     return "操作频繁"
+        // } else {
+        //     comm.showLog("没找到AMaximum number")
+        // }
+
+
+        for (let i = 0; i < 30; i++) {
+            let warning = idContains("g9g").visibleToUser(true).findOne(1000)
+            if (warning) {
+                let warningText = "登录警告:" + warning.text()
+                comm.showLog(warningText)
+                return warningText
+            } else {
+                let verifyInput = idContains("nmb").visibleToUser(true).findOne(1000)
+                if (verifyInput) {
+                    break
+                }
+            }
         }
 
 
-
-
-        let verifyEmail = selector().textContains("Verify email").visibleToUser(true).findOne(60000)
-        if (!verifyEmail) {
-            return "60s没进入验证码页"
-        }
+        // let verifyInput = idContains("nmb").visibleToUser(true).findOne(60000)
+        // if (!verifyInput) {
+        //     return "60s没进入验证码页"
+        // }
 
         //
         comm.showLog("请求验证码")
@@ -11787,9 +11843,6 @@ function login(email, username, loginType, password, code_url) {
         if (emailCode = 0) {
             return "验证码接口查询失败"
         }
-
-
-
         //Verification code is expired
         comm.showLog("找Verification code is expired")
         let expired = selector().textContains('Verification code is expired').visibleToUser(true).exists()
@@ -11805,103 +11858,103 @@ function login(email, username, loginType, password, code_url) {
 
     //点击continue
     comm.showLog("点击continue")
-    let continueBtn2 = selector().textContains('Continue').visibleToUser(true).findOne(2000)
-    if (continueBtn2) {
-        if (continueBtn2.text() != "Continue") {
-            return "没正确执行"
-        } else {
-            comm.clickObj(continueBtn2)
-            sleep(3000)
-        }
+    let btn = className("android.widget.Button").clickable().find()
+    let continueBtn = filterButtonByPosition(btn, "bottom")
+    if (continueBtn) {
+        comm.clickObj(continueBtn)
     }
     //
     sleep(8000)
 
-    
 
+    // //有个弹窗和密码验证
+    // let continueBtn3 = selector().text('Agree and continue').visibleToUser(true).findOne(2000)
+    // if (continueBtn3) {
+    //     comm.clickObj(continueBtn3)
+    //     sleep(3000)
+    // }
 
-    //有个弹窗和密码验证
-    let continueBtn3 = selector().text('Agree and continue').visibleToUser(true).findOne(2000)
-    if (continueBtn3) {
-        comm.clickObj(continueBtn3)
-        sleep(3000)
-    }
     // 是否有密码验证
-    if (selector().textContains('Verify identity').visibleToUser(true).exists()) {
-        let pwdBtn = selector().textContains('Password').visibleToUser(true).findOne(2000)
-        if (pwdBtn) {
-            comm.clickObj(pwdBtn)
-            sleep(2000)
-            let next2 = selector().textContains('Next').visibleToUser(true).findOne(2000)
-            if (next2) {
-                comm.clickObj(next2)
-            }
-        } else {
-            return "有密码验证页，但是没正确找到密码验证按钮"
-        }
-        //
-        sleep(2000)
-        let input = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
-        if (input) {
-            input.setText(password)
-            sleep(3000)
-        }
-        let next2 = selector().textContains('Next').visibleToUser(true).findOne(2000)
-        if (next2) {
-            comm.clickObj(next2)
-            sleep(3000)
-        }
-        sleep(5000)
-        // 判断是否存在密码输入
-        if (selector().textContains('Verify identity').visibleToUser(true).exists()) {
-            return "密码输入失败"
-        }
-    }
+    // if (selector().textContains('Verify identity').visibleToUser(true).exists()) {
+    //     let pwdBtn = selector().textContains('Password').visibleToUser(true).findOne(2000)
+    //     if (pwdBtn) {
+    //         comm.clickObj(pwdBtn)
+    //         sleep(2000)
+    //         let next2 = selector().textContains('Next').visibleToUser(true).findOne(2000)
+    //         if (next2) {
+    //             comm.clickObj(next2)
+    //         }
+    //     } else {
+    //         return "有密码验证页，但是没正确找到密码验证按钮"
+    //     }
+    //     //
+    //     sleep(2000)
+    //     let input = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
+    //     if (input) {
+    //         input.setText(password)
+    //         sleep(3000)
+    //     }
+    //     let next2 = selector().textContains('Next').visibleToUser(true).findOne(2000)
+    //     if (next2) {
+    //         comm.clickObj(next2)
+    //         sleep(3000)
+    //     }
+    //     sleep(5000)
+    //     // 判断是否存在密码输入
+    //     if (selector().textContains('Verify identity').visibleToUser(true).exists()) {
+    //         return "密码输入失败"
+    //     }
+    // }
 
     //防止登录成功后又弹回Email / Username页面
-    let log_in_btn = selector().textContains('Log in').visibleToUser(true).findOne(1000)
-    if (log_in_btn) {
-        let back = boundsInside(0, 0, device.width * 0.3, device.height * 0.15).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)//Open app
-        console.log("又弹回Email / Username页面");
-        comm.clickObj(back)
-        sleep(2000)
-    }
+    // let log_in_btn = selector().textContains('Log in').visibleToUser(true).findOne(1000)
+    // if (log_in_btn) {
+    //     let back = boundsInside(0, 0, device.width * 0.3, device.height * 0.15).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)//Open app
+    //     console.log("又弹回Email / Username页面");
+    //     comm.clickObj(back)
+    //     sleep(2000)
+    // }
 
-
-    let ChooseWhatYouLike = selector().textContains('Choose what you like').visibleToUser(true).findOne(2000)
-    if (ChooseWhatYouLike) {
-        let skipBtn = selector().text('Skip').visibleToUser(true).findOne(2000)
-        if (skipBtn) {
-            comm.clickObj(skipBtn)
-            sleep(3000)
-        }
+    //skip
+    let skipBtn = idContains("c43").visibleToUser(true).findOne(2000)
+    if (skipBtn) {
+        comm.clickObj(skipBtn)
+        sleep(3000)
     }
 
     sleep(2000)
     // Maximum number of attempts reached
-    comm.showLog("找Maximum number")
-    let maximum = selector().textContains('Maximum number').visibleToUser(true).exists()
-    if (maximum) {
-        return "操作频繁"
-    } else {
-        comm.showLog("没找到Maximum number")
-    }
+    // comm.showLog("找Maximum number")
+    // let maximum = selector().textContains('Maximum number').visibleToUser(true).exists()
+    // if (maximum) {
+    //     return "操作频繁"
+    // } else {
+    //     comm.showLog("没找到Maximum number")
+    // }
     //
     comm.showLog("找Account doesn't exist")
-    let accNoExist = selector().textContains("Account doesn't exist").visibleToUser(true).exists()
-    if (accNoExist) {
-        return "账号不存在"
-    } else {
-        comm.showLog("没找到Account doesn't exist")
-    }
+    // let accNoExist = selector().textContains("Account doesn't exist").visibleToUser(true).exists()
+    // if (accNoExist) {
+    //     return "账号不存在"
+    // } else {
+    //     comm.showLog("没找到Account doesn't exist")
+    // }
 
     sleep(3000)
     //判断是否存在找相同验证码
     comm.showLog("判断是否存在找相同验证码")
     for (let i = 0; i < 10; i++) {
         comm.showLog('判断有没有找相同验证码')
-        if (selector().textContains('recommendations').visibleToUser(true).exists()) {
+        let skipBtn = idContains("c43").visibleToUser(true).findOne(1000)
+        let newPolicy2 = idContains("x9o").visibleToUser(true).findOne(1000)
+        if (skipBtn || newPolicy2) {
             break
+        }
+
+
+        let StartWatchingBtn = idContains("saa").visibleToUser(true).findOne(1000)
+        if (StartWatchingBtn) {
+            comm.randomSwipe(1)
         }
 
         let select2Text = selector().textContains("Select 2 objects").visibleToUser(true).findOne(1000)
@@ -11992,21 +12045,29 @@ function login(email, username, loginType, password, code_url) {
         }
         comm.showLog("执行完验证码判断，继续")
         // 判断有没有在第二步验证界面
-        let auth2Step = selector().textContains('2-step').visibleToUser(true).exists()
+        let auth2Step = idContains("csj").visibleToUser(true).exists()
         if (auth2Step) {
             break
         }
-        let homeBtn = selector().textContains('Home').visibleToUser(true).findOne(1000)
-        if (homeBtn) {
+
+        let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
+        let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+        if (isMainPage && myProfile) {
             comm.randomSwipe(4)
-            return 'success'
+            return "success"
         }
+
+        // let homeBtn = selector().textContains('Home').visibleToUser(true).findOne(1000)
+        // if (homeBtn) {
+        //     comm.randomSwipe(4)
+        //     return 'success'
+        // }
         // 
         sleep(5000)
     }
     comm.showLog("验证码部分全部结束，判断是否在二步验证界面")
     //判断是否在二步验证界面
-    let auth2Step = selector().textContains('2-step').visibleToUser(true).exists()
+    let auth2Step = idContains("csj").visibleToUser(true).exists()
     if (auth2Step) {
         for (let j = 0; j < 3; j++) {
             // let jsonData = {
@@ -12019,20 +12080,27 @@ function login(email, username, loginType, password, code_url) {
                 let editText = selector().className("android.widget.EditText").visibleToUser(true).findOne(1000)
                 sysInputText(editText, vcode)
                 sleep(3000)
-                let continueBtn2 = selector().textContains('Continue').visibleToUser(true).findOne(3000)
-                if (!continueBtn2) {
-                    continueBtn2 = selector().textContains('Next').visibleToUser(true).findOne(3000)
-                }
-                if (continueBtn2) {
-                    let trustBtn = selector().textContains('Trust this').visibleToUser(true).findOne(3000)
-                    if (trustBtn) {
-                        comm.clickObj(trustBtn)
-                        sleep(2000)
+
+                //勾选不再需要二步验证
+                let check2Step2 = idContains("csg").visibleToUser(true).findOne(3000)
+                if (check2Step2) {
+                    if (!check2Step2.checked()) {
+                        comm.clickObj(check2Step2)
                     }
-                    comm.clickObj(continueBtn2)
-                    sleep(5000)
                 }
-                break
+
+                let btn = className("android.widget.Button").clickable().find()
+                let continueBtn = filterButtonByPosition(btn, "bottom")
+                if (continueBtn) {
+                    comm.clickObj(continueBtn)
+                    sleep(3000)
+                }
+
+                if (idContains("g9g").visibleToUser(true).exists()) {
+                    comm.showLog("二步验证码错误或超时警告")
+                } else {
+                    break
+                }
             }
             sleep(5000)
         }
@@ -12040,69 +12108,85 @@ function login(email, username, loginType, password, code_url) {
 
 
     //
-    let recommendations = selector().textContains('recommendations').visibleToUser(true).findOne(2000)
-    if (recommendations) {
-        let skipBtn = selector().text('Skip').visibleToUser(true).findOne(2000)
-        if (skipBtn) {
-            comm.clickObj(skipBtn)
-            sleep(3000)
-        }
+    // let recommendations = selector().textContains('recommendations').visibleToUser(true).findOne(2000)
+    // if (recommendations) {
+    //     let skipBtn = selector().text('Skip').visibleToUser(true).findOne(2000)
+    //     if (skipBtn) {
+    //         comm.clickObj(skipBtn)
+    //         sleep(3000)
+    //     }
+    // }
+
+
+    // let ChooseWhatYouLike_2 = selector().textContains('Choose what you like').visibleToUser(true).findOne(2000)
+    // if (ChooseWhatYouLike_2) {
+    //     let skipBtn = selector().text('Skip').visibleToUser(true).findOne(2000)
+    //     if (skipBtn) {
+    //         comm.clickObj(skipBtn)
+    //         sleep(3000)
+    //     }
+    // }
+
+    //skip
+    skipBtn = idContains("c43").visibleToUser(true).findOne(2000)
+    if (skipBtn) {
+        comm.clickObj(skipBtn)
+        sleep(3000)
     }
-
-
-    let ChooseWhatYouLike_2 = selector().textContains('Choose what you like').visibleToUser(true).findOne(2000)
-    if (ChooseWhatYouLike_2) {
-        let skipBtn = selector().text('Skip').visibleToUser(true).findOne(2000)
-        if (skipBtn) {
-            comm.clickObj(skipBtn)
-            sleep(3000)
-        }
-    }
-
 
     //
-    closeAllPop()
+    // closeAllPop()
+    //新政策弹窗 Got it
+    let newPolicy2 = idContains("x9o").visibleToUser(true).findOne(1000)
+    if (newPolicy2 && newPolicy2.childCount() == 3) {
+        comm.showLog("显示新的政策弹窗口+1")
+        commm.clickObj(newPolicy2.child(2))
+    }
 
-    //登录后界面处理
-    let tooManyTips = selector().textContains('Too many attempts').visibleToUser(true).exists()
-    if (tooManyTips) {
-        console.log('too many attempts')
-        return 'Too many attempts'
-    }
-    let maximumMsg = selector().textContains('Maximum number').visibleToUser(true).findOne(1000)
-    if (maximumMsg) {
-        console.log('操作频繁')
-        // return maximumMsg.text()
-        return "操作频繁"
-    }
-    accNoExist = selector().textContains("Account doesn't exist").visibleToUser(true).exists()
-    if (accNoExist) {
-        return "账号不存在"
-    }
-    //判断是否网络问题
-    let networkErrorInPsdExist = selector().textContains('No network connection').visibleToUser(true).exists()
-    if (!networkErrorInPsdExist) {
-        networkErrorInPsdExist = selector().textContains('No internet').visibleToUser(true).exists()
-    }
-    if (networkErrorInPsdExist) {
-        console.log('输入完邮箱出现无网络提示')
-        // return 'No network connection'
-        return '输入完邮箱出现无网络提示'
-    }
-    let i_agree = selector().textContains('I agree').visibleToUser(true).findOne(1000)
-    if (i_agree) {
-        comm.clickObj(i_agree)
-    }
-    let suspended = selector().textContains('suspended').visibleToUser(true).findOne(1000)
-    if (suspended) {
-        comm.showLog('账号被封禁')
-        // return suspended.text()
-        return "账号被封禁"
-    }
-    closeAllPop()
-    let skipInterestBtn = selector().textContains('Skip').visibleToUser(true).findOne(1000)
-    if (skipInterestBtn) {
-        comm.clickObj(skipInterestBtn)
+
+
+    // //登录后界面处理
+    // let tooManyTips = selector().textContains('Too many attempts').visibleToUser(true).exists()
+    // if (tooManyTips) {
+    //     console.log('too many attempts')
+    //     return 'Too many attempts'
+    // }
+    // let maximumMsg = selector().textContains('Maximum number').visibleToUser(true).findOne(1000)
+    // if (maximumMsg) {
+    //     console.log('操作频繁')
+    //     // return maximumMsg.text()
+    //     return "操作频繁"
+    // }
+    // accNoExist = selector().textContains("Account doesn't exist").visibleToUser(true).exists()
+    // if (accNoExist) {
+    //     return "账号不存在"
+    // }
+    // //判断是否网络问题
+    // let networkErrorInPsdExist = selector().textContains('No network connection').visibleToUser(true).exists()
+    // if (!networkErrorInPsdExist) {
+    //     networkErrorInPsdExist = selector().textContains('No internet').visibleToUser(true).exists()
+    // }
+    // if (networkErrorInPsdExist) {
+    //     console.log('输入完邮箱出现无网络提示')
+    //     // return 'No network connection'
+    //     return '输入完邮箱出现无网络提示'
+    // }
+    // let i_agree = selector().textContains('I agree').visibleToUser(true).findOne(1000)
+    // if (i_agree) {
+    //     comm.clickObj(i_agree)
+    // }
+    // let suspended = selector().textContains('suspended').visibleToUser(true).findOne(1000)
+    // if (suspended) {
+    //     comm.showLog('账号被封禁')
+    //     // return suspended.text()
+    //     return "账号被封禁"
+    // }
+    // closeAllPop()
+
+    // skip
+    skipBtn = idContains("c43").visibleToUser(true).findOne(2000)
+    if (skipBtn) {
+        comm.clickObj(skipBtn)
         sleep(3000)
         for (let ss = 0; ss < 3; ss++) {
             swipe(random(300, 330), random(1500, 1600), random(300, 330), random(100, 130), random(100, 300))
@@ -12111,35 +12195,49 @@ function login(email, username, loginType, password, code_url) {
         }
         return 'success'
     }
+
     // 检查是否有home
-    let homeBtn = selector().textContains('Home').visibleToUser(true).findOne(1000)
-    if (homeBtn) {
-        comm.showLog('已经登陆进去了')
+    let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
+    let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+    if (isMainPage && myProfile) {
+        comm.showLog('已经登录进去了')
         comm.randomSwipe(4)
-        return 'success'
+        return "success"
+    } else {
+        return "失败"
     }
-    let not_interested = selector().textContains('ot interested').visibleToUser(true).findOne(1000)
-    if (not_interested) {
-        comm.clickObj(not_interested)
-    }
-    let follow_your_friends = selector().textContains('Follow your friends').visibleToUser(true).findOne(1000)
-    if (follow_your_friends) {
-        let b = follow_your_friends.bounds()
-        click(500, b.top - 100)
-    }
-    let doNotAllowBtn = selector().textContains('t allow').visibleToUser(true).findOne(1000)
-    if (doNotAllowBtn) {
-        comm.clickObj(doNotAllowBtn)
-        sleep(1000)
-        for (let ss = 0; ss < 3; ss++) {
-            swipe(random(300, 330), random(1500, 1600), random(300, 330), random(100, 130), random(100, 300))
-            sleep(1000)
-        }
-    }
+
+    // // 检查是否有home
+    // let homeBtn = selector().textContains('Home').visibleToUser(true).findOne(1000)
+    // if (homeBtn) {
+    //     comm.showLog('已经登录进去了')
+    //     comm.randomSwipe(4)
+    //     return 'success'
+    // }
+
+
+    // let not_interested = selector().textContains('ot interested').visibleToUser(true).findOne(1000)
+    // if (not_interested) {
+    //     comm.clickObj(not_interested)
+    // }
+    // let follow_your_friends = selector().textContains('Follow your friends').visibleToUser(true).findOne(1000)
+    // if (follow_your_friends) {
+    //     let b = follow_your_friends.bounds()
+    //     click(500, b.top - 100)
+    // }
+    // let doNotAllowBtn = selector().textContains('t allow').visibleToUser(true).findOne(1000)
+    // if (doNotAllowBtn) {
+    //     comm.clickObj(doNotAllowBtn)
+    //     sleep(1000)
+    //     for (let ss = 0; ss < 3; ss++) {
+    //         swipe(random(300, 330), random(1500, 1600), random(300, 330), random(100, 130), random(100, 300))
+    //         sleep(1000)
+    //     }
+    // }
     //
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLog('已经登陆进去了')
+        comm.showLog('已经登录进去了')
         comm.randomSwipe(4)
         return "success"
     } else {
@@ -12487,7 +12585,7 @@ function WasLoggedOutAndLogin() {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLogToFile('已经登陆进去了')
+        comm.showLogToFile('已经登录进去了')
         comm.randomSwipe(4)
         //
         // comm.showLog('发送备份请求')
@@ -12858,7 +12956,7 @@ function WasLoggedOutAndLogin_v2() {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLogToFile('已经登陆进去了')
+        comm.showLogToFile('已经登录进去了')
         comm.randomSwipe(4)
         //
         // comm.showLog('发送备份请求')
@@ -13049,7 +13147,7 @@ function WasLoggedOutAndLogin_other() {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLogToFile('已经登陆进去了')
+        comm.showLogToFile('已经登录进去了')
         comm.randomSwipe(4)
         //
         // comm.showLog('发送备份请求')
@@ -13476,7 +13574,7 @@ function WasLoggedOutAndLogin_other_v2() {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLogToFile('已经登陆进去了')
+        comm.showLogToFile('已经登录进去了')
         comm.randomSwipe(4)
         //
         // comm.showLog('发送备份请求')
@@ -13617,7 +13715,7 @@ function WasLoggedOutAndLogin_Test(email_my) {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLog('已经登陆进去了')
+        comm.showLog('已经登录进去了')
         comm.randomSwipe(4)
         //
         comm.showLog('发送备份请求')
@@ -14098,7 +14196,7 @@ function WasLoggedOutAndLogin_v3() {
     sleep(10000)
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLogToFile('已经登陆进去了')
+        comm.showLogToFile('已经登录进去了')
         comm.randomSwipe(4)
         //
         // comm.showLog('发送备份请求')
@@ -14171,7 +14269,7 @@ function loginJastUserameAndPassword(username, password, code_url) {
     comm.showLog("登录的for--3")
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLog('已经登陆进去了')
+        comm.showLog('已经登录进去了')
         return "success"
     }
     //
@@ -14463,7 +14561,7 @@ function loginJastUserameAndPassword(username, password, code_url) {
     //
     //判断是不是在首页
     if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
-        comm.showLog('已经登陆进去了')
+        comm.showLog('已经登录进去了')
         comm.randomSwipe(4)
         //
         comm.showLog('发送备份请求')
@@ -15412,7 +15510,7 @@ function register(reg_type, email, mobile, password, nickname) {
         //判断是否进入首页
         if (selector().textContains('Home').visibleToUser(true).findOne(1000) && selector().textContains('Profile').visibleToUser(true).findOne(1000)) {
             // if (selector().textContains('Home').visibleToUser(true).findOne(2000)){
-            comm.showLog('已经登陆进去了')
+            comm.showLog('已经登录进去了')
             break
         }
         sleep(3000)
@@ -16897,7 +16995,6 @@ function openTiktok_v2_bak(type, url) {
 //关闭所有弹窗
 function closeAllPop() {
     comm.showLog("检测关闭所有弹窗")
-
     try {
         //新弹窗
         if (selector().textContains('he higher you rank').visibleToUser(true).exists()) {
@@ -17007,6 +17104,15 @@ function closeAllPop() {
             comm.clickObj(newPolicy)
             sleep(1000)
         }
+
+        //新政策弹窗 Got it
+        let newPolicy2 = idContains("x9o").visibleToUser(true).findOne(1000)
+        if (newPolicy2 && newPolicy2.childCount() == 3) {
+            comm.showLog("显示新的政策弹窗口+1")
+            commm.clickObj(newPolicy2.child(2))
+        }
+
+
         //新政策弹窗+1  Limited time event! Collect flowersto fill the gift box and gainrewards!
         let notInterestedBtn = selector().textContains('Not interested').visibleToUser(true).findOne(1000)
         if (notInterestedBtn) {
@@ -17439,9 +17545,7 @@ function selectTkBirthday2() {
     return result
 }
 function selectTkBirthday(task_id) {
-
     //设置出生年月日
-
     sleep(1000)
     let seekBars = selector().visibleToUser(true).className('android.widget.SeekBar').find()
     comm.showLog("seekBars " + seekBars.length)
@@ -18309,22 +18413,23 @@ function googleOpenTk() {
                 sleep(2000)
                 setText("www.tiktok.com");
             }
-        } id("signin_fre_dismiss_button")
+        }
+        if (packageName("com.zhiliaoapp.musically").exists()) {
+            comm.showLog("已打开TikTok")
+            break;
+        }
         //浏览跳转tk相关按钮
         let googleBtn = id("terms_accept").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
         if (!googleBtn) {
             googleBtn = id("negative_button").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
             if (!googleBtn) {
-                googleBtn = packageName("com.android.chrome").boundsInside(0, 0, device.width, device.height / 3).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)//Open app
+                googleBtn = idContains("message_primary_button").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
                 if (!googleBtn) {
-                    googleBtn = idContains("message_primary_button").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000);
+                    googleBtn = packageName("com.android.chrome").boundsInside(0, 0, device.width, device.height / 3).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)//Open app
                     if (!googleBtn) {
-                        googleBtn = idContains("signin_fre_dismiss_button").visibleToUser(true).findOne(1000);
+                        googleBtn = idContains("message_primary_button").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000);
                         if (!googleBtn) {
-                            if (packageName("com.zhiliaoapp.musically").exists()) {
-                                comm.showLog("已打开TikTok")
-                                break;
-                            }
+                            googleBtn = idContains("signin_fre_dismiss_button").visibleToUser(true).findOne(1000);
                         }
                     }
                 }
@@ -18457,22 +18562,40 @@ function menu() {
             test = true
             sleep(2000)
             let email = "karilynmonroe1206@mailsdog.com";
-            let loginType = 1;
+            let loginType = 2;
             let username = "karilynmonroe1206"
             let password = "ec649a9d8c@96e2";
             let vcode_url = "TQJIMQPIYXCHLO62IBUODGLSHBEV3S44";
-            for (let i = 0; i < 5; i++) {
+            sleep(2000)
+            // login(email, username, loginType, password, vcode_url) == "success"
+
+            // let email = "macaleb00@ttusmail.com";
+            // let loginType = 2;
+            // let username = "macaleb00"
+            // let password = "8bc239a8dc@1e56";
+            // let vcode_url = "DLYXYDH5L6T4QP6FNYNJKXDT25FZNQEH";
+            sleep(2000)
+            httpShell('am force-stop com.zhiliaoapp.musically')
+            httpShell('pm clear com.zhiliaoapp.musically')
+            for (let i = 0; i < 20; i++) {
                 if (login(email, username, loginType, password, vcode_url) == "success") {
                     httpShell('am force-stop com.zhiliaoapp.musically')
                     httpShell('pm clear com.zhiliaoapp.musically')
                     sleep(5000)
                 } else {
-                    alert("登录失败")
+                    alert("第:" + i + "次登录失败")
                     break
                 }
             }
+
+
+            // let email = "7OwBjz8n734@houjiutu.com";
+            // let password = "HH2gR5GqKQ48B";
+            // let nickname = ""
+
+            // register_google(email, password, nickname)
+
             console.log("测试结束");
-            
             break
             sleep(8000);
         case 6: //不要改
@@ -22198,4 +22321,71 @@ function selectShopProductHome(like_title_txt, title_txt) {
         }
     }
     return isViewed
+}
+
+/**
+ * 从按钮集合中筛选指定位置的控件
+ * @param {UiObject[]} buttons - 按钮控件数组
+ * @param {string} position - 位置参数：left|right|top|bottom|topLeft|topRight|bottomLeft|bottomRight
+ * @returns {UiObject|null} 返回匹配的控件或null
+ */
+function filterButtonByPosition(buttons, position) {
+    if (!buttons || buttons.length === 0) return null;
+
+    let result = buttons[0];
+    const boundsCache = buttons.map(btn => btn.bounds());
+
+    switch (position) {
+        case 'left':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].left < prev.bounds().left ? curr : prev);
+            break;
+        case 'right':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].right > prev.bounds().right ? curr : prev);
+            break;
+        case 'top':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].top < prev.bounds().top ? curr : prev);
+            break;
+        case 'bottom':
+            result = buttons.reduce((prev, curr, idx) =>
+                boundsCache[idx].bottom > prev.bounds().bottom ? curr : prev);
+            break;
+        case 'topLeft':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.left + currBounds.top) < (prevBounds.left + prevBounds.top)
+                    ? curr : prev;
+            });
+            break;
+        case 'topRight':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.right - currBounds.top) > (prevBounds.right - prevBounds.top)
+                    ? curr : prev;
+            });
+            break;
+        case 'bottomLeft':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.left - currBounds.bottom) < (prevBounds.left - prevBounds.bottom)
+                    ? curr : prev;
+            });
+            break;
+        case 'bottomRight':
+            result = buttons.reduce((prev, curr, idx) => {
+                const currBounds = boundsCache[idx];
+                const prevBounds = prev.bounds();
+                return (currBounds.right + currBounds.bottom) > (prevBounds.right + prevBounds.bottom)
+                    ? curr : prev;
+            });
+            break;
+        default:
+            throw new Error('Invalid position parameter');
+    }
+    return result;
 }
