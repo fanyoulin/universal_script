@@ -11857,10 +11857,10 @@ function login(email, username, loginType, password, code_url) {
     sleep(3000)
 
     //点击continue
-    comm.showLog("点击continue")
     let btn = className("android.widget.Button").clickable().find()
     let continueBtn = filterButtonByPosition(btn, "bottom")
     if (continueBtn) {
+        comm.showLog("点击continue")
         comm.clickObj(continueBtn)
     }
     //
@@ -18562,7 +18562,7 @@ function menu() {
             test = true
             sleep(2000)
             let email = "karilynmonroe1206@mailsdog.com";
-            let loginType = 2;
+            let loginType = 1;
             let username = "karilynmonroe1206"
             let password = "ec649a9d8c@96e2";
             let vcode_url = "TQJIMQPIYXCHLO62IBUODGLSHBEV3S44";
