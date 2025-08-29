@@ -560,15 +560,20 @@ function filterButtonByPosition(buttons, position) {
     return result;
 }
 
-let verifyInput = idContains("nmb").visibleToUser(true).findOne(60000)
-                if (verifyInput) {
-                    log(verifyInput)
-                }
+let ishome = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+if (ishome) {
+    comm.clickObj(ishome)
+}
+
+// let btn = aa.find(className("android.widget.TextView"))
+// log(btn[1].text())
+
 // log(filterButtonByPosition(btn, "bottom"))
 
-// console.log(idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000).childCount()); 
+// console.log(idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000).childCount());
 
 
 
 
 
+// text("Email/tên người dùng")

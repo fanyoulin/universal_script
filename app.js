@@ -11589,13 +11589,68 @@ function login(email, username, loginType, password, code_url) {
         //     sleep(3000)
         // }
 
+
+        for (let i = 0; i < 5; i++) {
+            let sp = idContains("cr9").className("android.widget.TextView").clickable(false).visibleToUser(true).findOne(1000);
+            if (sp) {
+                console.log("到达登录页");
+                break
+            }
+            //头像
+            let profilePicture = idContains("az_").className("android.widget.Button").clickable(false).visibleToUser(true).findOne(1000);
+            if (profilePicture) {
+                comm.showLog('已经登录进去了')
+                let ishome = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+                if (ishome) {
+                    comm.clickObj(ishome)
+                }
+                return "success"
+            }
+
+            //skip
+            let skipBtn = idContains("c43").visibleToUser(true).findOne(2000)
+            if (skipBtn) {
+                comm.clickObj(skipBtn)
+                sleep(3000)
+            }
+
+            let agreeAndContinue = idContains("dnm").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
+            if (agreeAndContinue) {
+                console.log("同意并继续");
+                comm.clickObj(agreeAndContinue)
+                //
+            }
+
+            //判断是否直接进入的主页,如果是主页就点击profile进入登录注册页面
+            let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
+            if (isMainPage) {
+                let hintGesture = idContains("vw_").className("android.widget.TextView").visibleToUser(true).findOne(1000)
+                if (hintGesture) {
+                    console.log("发现滑动提示，滑动关闭");
+                    comm.randomSwipe(1)
+                    sleep(3000)
+                }
+
+                let ishome = idContains("lax").selected().className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+                if (ishome) {
+                    console.log("选中home状态");
+                    let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+                    if (myProfile) {
+                        console.log("发现profile，进入");
+                        comm.clickObj(myProfile)
+                    }
+                }
+
+            }
+            sleep(2000)
+        }
+
         for (let i = 0; i < 3; i++) {
             let sp = idContains("cr9").className("android.widget.TextView").clickable(false).visibleToUser(true).findOne(1000);
             if (sp) {
                 if (sp && sp.text().indexOf("/") != -1) {
                     comm.showLog("进入User phone/email/username")
                     comm.clickObj(sp)
-                    sleep(3000)
                 } else {
                     sp = idContains("v9w").clickable().className("android.widget.Button").visibleToUser(true).findOne(1000);
                     if (sp) {
@@ -11646,6 +11701,7 @@ function login(email, username, loginType, password, code_url) {
         //找email/username的上上级控件,找到便点击它的第二个子控件,email/username的父控件
         let clickEmailUsername = false
         for (let i = 0; i < 10; i++) {
+            //找Email/Username
             let emailUsernameParent = idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).findOne(3000)
             if (emailUsernameParent && emailUsernameParent.childCount() == 2) {
                 if (emailUsernameParent.child(1).selected()) {
@@ -11655,6 +11711,22 @@ function login(email, username, loginType, password, code_url) {
                 }
                 comm.showLog("找到Email/Username并点击")
                 comm.clickObj(emailUsernameParent.child(1))
+            } else {
+                //找Email/Username方案2
+                let nh5Collect = idContains("nh5").className("android.widget.HorizontalScrollView").visibleToUser(true).find()
+                if (nh5Collect.length != 0) {
+                    let nh5TextView = nh5Collect.find(className("android.widget.TextView"))
+                    if (nh5TextView.length != 0) {
+                        if (nh5TextView[1].selected()) {
+                            comm.showLog("Email/Username已选中")
+                            clickEmailUsername = true
+                            break
+                        }
+                        comm.showLog("找到Email/Username")
+                        comm.clickObj(nh5TextView[1])
+                    }
+                }
+
             }
             sleep(3000)
         }
@@ -11689,14 +11761,14 @@ function login(email, username, loginType, password, code_url) {
         //     break
         // }
 
-        comm.showLog("登录的for--3")
-        //判断是不是在首页
-        let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
-        let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
-        if (isMainPage && myProfile) {
-            comm.showLog('已经登录进去了')
-            return "success"
-        }
+        // comm.showLog("登录的for--3")
+        // //判断是不是在首页
+        // let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
+        // let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
+        // if (isMainPage && myProfile) {
+        //     comm.showLog('已经登录进去了')
+        //     return "success"
+        // }
 
 
         // if (selector().textContains('Home').visibleToUser(true).exists() && selector().textContains('Profile').visibleToUser(true).exists()) {
@@ -11761,8 +11833,8 @@ function login(email, username, loginType, password, code_url) {
         comm.showLog("输入密码")
         comm.clickObj(inputs[2])
         httpShell('am force-stop com.google.android.inputmethod.latin')
-        sysInputText(inputs[2], password)
-
+        // sysInputText(inputs[2], password)
+        setText(password)
 
     } else {//邮箱登录
         let inputs = selector().className('android.widget.EditText').find()
@@ -11835,7 +11907,8 @@ function login(email, username, loginType, password, code_url) {
             if (emailCode != 0) {
                 comm.showLog("输入验证码")
                 inputs = selector().className('android.widget.EditText').find()
-                sysInputText(inputs[0], emailCode)
+                setText(emailCode)
+                // sysInputText(inputs[0], emailCode)
                 break
             }
             sleep(5000)
@@ -12053,6 +12126,7 @@ function login(email, username, loginType, password, code_url) {
         let isMainPage = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(3000)//home
         let myProfile = idContains("laz").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
         if (isMainPage && myProfile) {
+            comm.showLog('已经登录进去了')
             comm.randomSwipe(4)
             return "success"
         }
@@ -12078,7 +12152,8 @@ function login(email, username, loginType, password, code_url) {
                 let vcode = ''
                 vcode = vcodeStr
                 let editText = selector().className("android.widget.EditText").visibleToUser(true).findOne(1000)
-                sysInputText(editText, vcode)
+                // sysInputText(editText, vcode)
+                setText(vcode)
                 sleep(3000)
 
                 //勾选不再需要二步验证
@@ -18567,6 +18642,7 @@ function menu() {
             let password = "ec649a9d8c@96e2";
             let vcode_url = "TQJIMQPIYXCHLO62IBUODGLSHBEV3S44";
             sleep(2000)
+            login(email, username, loginType, password, vcode_url)
             // login(email, username, loginType, password, vcode_url) == "success"
 
             // let email = "macaleb00@ttusmail.com";
@@ -18574,19 +18650,19 @@ function menu() {
             // let username = "macaleb00"
             // let password = "8bc239a8dc@1e56";
             // let vcode_url = "DLYXYDH5L6T4QP6FNYNJKXDT25FZNQEH";
-            sleep(2000)
-            httpShell('am force-stop com.zhiliaoapp.musically')
-            httpShell('pm clear com.zhiliaoapp.musically')
-            for (let i = 0; i < 20; i++) {
-                if (login(email, username, loginType, password, vcode_url) == "success") {
-                    httpShell('am force-stop com.zhiliaoapp.musically')
-                    httpShell('pm clear com.zhiliaoapp.musically')
-                    sleep(5000)
-                } else {
-                    alert("第:" + i + "次登录失败")
-                    break
-                }
-            }
+            // sleep(2000)
+            // httpShell('am force-stop com.zhiliaoapp.musically')
+            // httpShell('pm clear com.zhiliaoapp.musically')
+            // for (let i = 0; i < 20; i++) {
+            //     if (login(email, username, loginType, password, vcode_url) == "success") {
+            //         httpShell('am force-stop com.zhiliaoapp.musically')
+            //         httpShell('pm clear com.zhiliaoapp.musically')
+            //         sleep(5000)
+            //     } else {
+            //         alert("第:" + i + "次登录失败")
+            //         break
+            //     }
+            // }
 
 
             // let email = "7OwBjz8n734@houjiutu.com";
