@@ -467,10 +467,149 @@ comm.randomSwipeToTop = function (num) {
 //         }
 //     }
 // }
+function selectTkBirthday(task_id) {
+    //设置出生年月日
+    sleep(1000)
+    let seekBars = selector().visibleToUser(true).className('android.widget.SeekBar').find()
+    comm.showLog("seekBars " + seekBars.length)
+    let x_1 = 0
+    let y_1 = 0
+    let x_2 = 0
+    let y_2 = 0
+    let yearChild = 2//默认美国版年龄控件为第3个
+    for (let i = 0; i < seekBars.length; i++) {
+        let child = seekBars[i];
+        //屏幕上滑
+        //let btnWidth = child.bounds().right - child.bounds().left - 50
+        //let btnHeight = child.bounds().bottom - child.bounds().top - 80
+        let currentBtnX = child.bounds().centerX()
+        //- random((0 - btnWidth) / 2, btnWidth / 2)
+
+        //comm.showLog(currentBtnX+","+currentBtnY)
+        //- random((0 - btnHeight) / 2 , btnHeight / 2)
+        let swipeCount = 6
+        //默认年龄控件为2  第三个子控件
+        if (yearChild > 0) {
+            if (i === 0) {
+                swipeCount = random(3, 5)
+            } else if (i === 1) {
+                swipeCount = random(1, 5)
+            } else if (i === 2) {
+                swipeCount = random(4, 10)
+            }
+        } else {
+            if (i === 1) {
+                swipeCount = random(1, 5)
+            } else if (i === 2) {
+                swipeCount = random(3, 5)
+            }
+        }
+
+        if (i == 1) {
+            x_1 = currentBtnX
+            y_1 = child.bounds().centerY() - (random(50, 100))
+            x_2 = currentBtnX
+            y_2 = child.bounds().bottom + random(150, 200)
+        }
+        for (let j = 0; j < swipeCount; j++) {
+            let currentBtnY = child.bounds().centerY() - (random(50, 100))
+            swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+            sleep(random(100, 500))
+        }
+
+        //每次循环都获取一次年龄  年龄控件默认为2024 不在范围内则代表刚刚变动 如果年龄不在需求范围内则代表当前子控件是年龄控件  调整至需求范围
+        let editText = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
+        let year = parseInt(editText.text().match(/\d{4}/g));
+        if (year < 2024 && year > 2004) {
+            //如果年龄子控件为第一个则
+            if (i == 0) {
+                yearChild = 0
+                swipeCount = random(4, 10)
+                for (let j = 0; j < swipeCount; j++) {
+                    let currentBtnY = child.bounds().centerY() - (random(50, 100))
+                    swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+                    sleep(random(100, 500))
+                }
+            }
+
+            for (let k = 0; k < 15; k++) {
+                sleep(1000)
+                let editText = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
+                let year = parseInt(editText.text().match(/\d{4}/g));
+                if (year > 2004) {
+                    comm.showLog("年龄太小:" + year)
+                    let currentBtnY = child.bounds().centerY() - (random(100, 200))
+                    swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+                    sleep(random(100, 500))
+                } else {
+                    comm.showLog("年龄通过:" + year)
+                    break
+                }
+            }
+        }
+        sleep(1000)
+    }
+
+    let continueBtn = boundsInside(0, device.height / 2, device.width, device.height).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
+    if (continueBtn) {
+        comm.clickObj(continueBtn)
+        sleep(3000)
+    } else {
+        let continueBtnU = idContains("a8o").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
+        if (continueBtnU) {
+            comm.clickObj(continueBtnU)
+            sleep(3000)
+        } else {
+            comm.showLog("获取不到continueBtn")
+        }
+    }
 
 
-let email = "zAjbiLtDXAD@houjiutu.com";
-let password = "lU1eXJvnEG564";
+    let registerNextBtn = selector().visibleToUser(true).textContains('Next').findOne(10000)
+    if (!registerNextBtn) {
+        toastLog('注册选完年龄下一步控件未找到')
+        return '注册选完年龄下一步控件未找到'
+    }
+
+    comm.clickObj(registerNextBtn)
+    sleep(6000)
+    let result = false
+    let fcnt = 0
+    for (let index = 0; index < 10; index++) {
+        let password = selector().textContains("password").visibleToUser(true).findOne(2000)
+        if (password) {
+            result = true
+            break
+        }
+        let nickname = selector().textContains("nickname").visibleToUser(true).findOne(2000)
+        if (nickname) {
+            result = true
+            break
+        }
+        let phone = selector().textContains("Phone").visibleToUser(true).findOne(1000)
+        let email = selector().textContains("Email").visibleToUser(true).findOne(1000)
+        if (email && phone) {
+            result = true
+            break
+        }
+        registerNextBtn = selector().visibleToUser(true).textContains('Next').findOne(1000)
+        if (registerNextBtn) {
+            if (fcnt > 3) {
+                break
+            }
+            swipe(x_1, y_1, x_2, y_2, random(500, 700))
+            sleep(2000)
+            //   comm.showLog('开始切换ip')
+            //   comm.httpToString(httpServer+'/api/setProxy?client_no='+client_no+'&key=63347f5d946164a23faca26b78a91e1c&task_id='+task_id)
+            //   sleep(2000)
+            comm.clickObj(registerNextBtn)
+            toastLog("重新点击next")
+            sleep(6000)
+            fcnt++
+        }
+    }
+    return result
+}
 
 // let inputEmail = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
 //     if (inputEmail) {
@@ -560,13 +699,168 @@ function filterButtonByPosition(buttons, position) {
     return result;
 }
 
-let ishome = idContains("lax").className("android.widget.FrameLayout").clickable().visibleToUser(true).findOne(1000)
-if (ishome) {
-    comm.clickObj(ishome)
-}
+// let verifyIdentityPage = idContains("root").visibleToUser(true).findOne(1000)
+// if (verifyIdentityPage) {
+//    console.log("验证身份页面");
 
+// }
+// 
+
+
+// }
+// className("android.view.View").
 // let btn = aa.find(className("android.widget.TextView"))
 // log(btn[1].text())
+
+function selectTkBirthday(task_id) {
+    //设置出生年月日
+    sleep(1000)
+    let seekBars = selector().visibleToUser(true).className('android.widget.SeekBar').find()
+    comm.showLog("seekBars " + seekBars.length)
+    let x_1 = 0
+    let y_1 = 0
+    let x_2 = 0
+    let y_2 = 0
+    let yearChild = 2//默认美国版年龄控件为第3个
+    for (let i = 0; i < seekBars.length; i++) {
+        let child = seekBars[i];
+        //屏幕上滑
+        //let btnWidth = child.bounds().right - child.bounds().left - 50
+        //let btnHeight = child.bounds().bottom - child.bounds().top - 80
+        let currentBtnX = child.bounds().centerX()
+        //- random((0 - btnWidth) / 2, btnWidth / 2)
+
+        //comm.showLog(currentBtnX+","+currentBtnY)
+        //- random((0 - btnHeight) / 2 , btnHeight / 2)
+        let swipeCount = 6
+        //默认年龄控件为2  第三个子控件
+        if (yearChild > 0) {
+            if (i === 0) {
+                swipeCount = random(3, 5)
+            } else if (i === 1) {
+                swipeCount = random(1, 5)
+            } else if (i === 2) {
+                swipeCount = random(4, 10)
+            }
+        } else {
+            if (i === 1) {
+                swipeCount = random(1, 5)
+            } else if (i === 2) {
+                swipeCount = random(3, 5)
+            }
+        }
+
+        if (i == 1) {
+            x_1 = currentBtnX
+            y_1 = child.bounds().centerY() - (random(50, 100))
+            x_2 = currentBtnX
+            y_2 = child.bounds().bottom + random(150, 200)
+        }
+        for (let j = 0; j < swipeCount; j++) {
+            let currentBtnY = child.bounds().centerY() - (random(50, 100))
+            swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+            sleep(random(100, 500))
+        }
+
+        //每次循环都获取一次年龄  年龄控件默认为2024 不在范围内则代表刚刚变动 如果年龄不在需求范围内则代表当前子控件是年龄控件  调整至需求范围
+        let editText = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
+        let year = parseInt(editText.text().match(/\d{4}/g));
+        if (year < 2024 && year > 2004) {
+            //如果年龄子控件为第一个则
+            if (i == 0) {
+                yearChild = 0
+                swipeCount = random(4, 10)
+                for (let j = 0; j < swipeCount; j++) {
+                    let currentBtnY = child.bounds().centerY() - (random(50, 100))
+                    swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+                    sleep(random(100, 500))
+                }
+            }
+
+            for (let k = 0; k < 15; k++) {
+                sleep(1000)
+                let editText = selector().className('android.widget.EditText').visibleToUser(true).findOne(1000)
+                let year = parseInt(editText.text().match(/\d{4}/g));
+                if (year > 2004) {
+                    comm.showLog("年龄太小:" + year)
+                    let currentBtnY = child.bounds().centerY() - (random(100, 200))
+                    swipe(currentBtnX, currentBtnY, currentBtnX, child.bounds().bottom + random(150, 200), random(500, 700))
+                    sleep(random(100, 500))
+                } else {
+                    comm.showLog("年龄通过:" + year)
+                    break
+                }
+            }
+        }
+        sleep(1000)
+    }
+
+    let continueBtn = boundsInside(0, device.height / 2, device.width, device.height).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
+    if (continueBtn) {
+        comm.clickObj(continueBtn)
+        sleep(3000)
+    } else {
+        let continueBtnU = idContains("a8o").className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
+        if (continueBtnU) {
+            comm.clickObj(continueBtnU)
+            sleep(3000)
+        } else {
+            comm.showLog("获取不到continueBtn")
+        }
+    }
+
+
+    let registerNextBtn = selector().visibleToUser(true).textContains('Next').findOne(10000)
+    if (!registerNextBtn) {
+        toastLog('注册选完年龄下一步控件未找到')
+        return '注册选完年龄下一步控件未找到'
+    }
+
+    comm.clickObj(registerNextBtn)
+    sleep(6000)
+    let result = false
+    let fcnt = 0
+    for (let index = 0; index < 10; index++) {
+        let password = selector().textContains("password").visibleToUser(true).findOne(2000)
+        if (password) {
+            result = true
+            break
+        }
+        let nickname = selector().textContains("nickname").visibleToUser(true).findOne(2000)
+        if (nickname) {
+            result = true
+            break
+        }
+        let phone = selector().textContains("Phone").visibleToUser(true).findOne(1000)
+        let email = selector().textContains("Email").visibleToUser(true).findOne(1000)
+        if (email && phone) {
+            result = true
+            break
+        }
+        registerNextBtn = selector().visibleToUser(true).textContains('Next').findOne(1000)
+        if (registerNextBtn) {
+            if (fcnt > 3) {
+                break
+            }
+            swipe(x_1, y_1, x_2, y_2, random(500, 700))
+            sleep(2000)
+            //   comm.showLog('开始切换ip')
+            //   comm.httpToString(httpServer+'/api/setProxy?client_no='+client_no+'&key=63347f5d946164a23faca26b78a91e1c&task_id='+task_id)
+            //   sleep(2000)
+            comm.clickObj(registerNextBtn)
+            toastLog("重新点击next")
+            sleep(6000)
+            fcnt++
+        }
+    }
+    return result
+}
+
+let is_appeal = textMatches(/(.*Start appeal.*|.*종.*)/).visibleToUser(true).className("android.widget.Button").findOne(1000);
+        if (is_appeal) {
+            log("有申诉")
+        }
+
 
 // log(filterButtonByPosition(btn, "bottom"))
 

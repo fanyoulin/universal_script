@@ -35,6 +35,15 @@ var test = false   //测试
 var tkShareString = ""  //tk老邀新活动复制的链接
 var account_id = 0
 //
+// var ws = connectWebSocket()
+// var connectState = false
+
+
+// setInterval(() => {
+//     ws.send('ping')
+// }, 15000);
+
+
 importClass('java.net.Inet4Address');
 importClass('java.net.InetAddress');
 importClass('java.net.NetworkInterface');
@@ -9381,8 +9390,6 @@ function finishTask(status, username, account_id) {
 
 // 修改过新增了模拟回滑
 function imageCodeVerify_test(isEmailRegister, isMobile) {
-
-
     //刷新按钮
     let refreshBtn = selector().textContains('Refresh').visibleToUser(true).findOne(3000)
     if (!refreshBtn) {
@@ -14931,15 +14938,20 @@ function register_google(email, password, nickname) {
         //查看是否在生日页面
         comm.showLog("判断是否在生日页面")
         sleep(2000)
-        let yourBirthdateWonModel = selector().textContains('Your birthdate won').visibleToUser(true).findOne(1000)
-        if (!yourBirthdateWonModel) {
-            yourBirthdateWonModel = selector().textContains('Your birthday won').visibleToUser(true).findOne(1000)
-        }
+        let yourBirthdateWonModel = selector().visibleToUser(true).className('android.widget.SeekBar').findOne(1000) //idContains("ice").visibleToUser(true).findOne(1000)
         if (yourBirthdateWonModel) {
             comm.showLog("在生日页面中")
-            //
-        } else {
-            comm.showLog("不在生日页面中")
+            let signUp = idContains("m9n").className("android.widget.LinearLayout").visibleToUser(true).findOne(1000)
+            if (signUp) {
+                comm.showLog("点一下signUp")
+                comm.clickObj(signUp)
+            }
+            let signUp2 = idContains("l76").className("android.widget.Button").visibleToUser(true).findOne(1000)
+            if (signUp2) {
+                comm.showLog("点一下signUp")
+                comm.clickObj(signUp2)
+            }
+
         }
 
         //判断是否直接进入的主页,如果是主页就点击profile进入登录注册页面
@@ -15089,8 +15101,7 @@ function register_google(email, password, nickname) {
     }
     //
     sleep(8000)
-    let markTag = false
-    //
+
     for (let i = 0; i < 10; i++) {
         //
         if (i > 9) {
@@ -15101,6 +15112,12 @@ function register_google(email, password, nickname) {
         if (packageName("com.zhiliaoapp.musically").exists()) {
             break;
         }
+        let is_appeal = textMatches(/(.*Start appeal.*|.*종.*)/).visibleToUser(true).className("android.widget.Button").findOne(1000);
+        if (is_appeal) {
+            comm.showLog('账号被封禁')
+            return "账号被封禁"
+        }
+
         if (idContains("yDmH0d").findOne(1000)) {
             let nextBtn = packageName("com.google.android.gms").boundsInside(device.width / 2, device.height / 2, device.width, device.height).className("android.widget.Button").clickable().visibleToUser(true).findOne(1000)
             if (nextBtn) {
@@ -15131,8 +15148,34 @@ function register_google(email, password, nickname) {
     //
     sleep(10000)
     for (let i = 0; i < 10; i++) {
+        //他人邮箱,暂时不考虑 先注释
+        // let verifyIdentityPage = idContains("root").visibleToUser(true).findOne(1000)
+        // if (verifyIdentityPage) {
+
+        //     let codeInput = idContains("code-input").visibleToUser(true).findOne(1000)
+        //     if (codeInput) {
+        //         break
+        //     }
+
+        //     let listView = className("android.widget.ListView").visibleToUser(true).findOne(1000)
+        //     if (listView) {
+        //         comm.clickObj(listView)
+        //     }
+
+        //     let rootButton = verifyIdentityPage.find(className("android.widget.Button").indexInParent(0))
+        //     if (rootButton.length != 0) {
+        //         let nextBtn = filterButtonByPosition(rootButton, "bottom")
+        //         if (nextBtn && nextBtn.text() != "") {
+        //             console.log(nextBtn);
+        //         }
+        //     }
+        // }
+
+
+
+        //root 验证真的是你页面
         //
-        let yourBirthdateWonModel = selector().visibleToUser(true).className('android.widget.SeekBar').find() //idContains("ice").visibleToUser(true).findOne(1000)
+        let yourBirthdateWonModel = selector().visibleToUser(true).className('android.widget.SeekBar').findOne(1000) //idContains("ice").visibleToUser(true).findOne(1000)
         if (yourBirthdateWonModel) {
             comm.showLog("在生日页面中")
             break
@@ -15161,6 +15204,8 @@ function register_google(email, password, nickname) {
         }
         sleep(8000)
     }
+
+
     sleep(5000)
     // 选择生日
     let reSelectB = selectTkBirthday()
@@ -17068,7 +17113,7 @@ function openTiktok_v2_bak(type, url) {
 }
 
 //关闭所有弹窗
-function closeAllPop() {
+function closeAllPop_Old() {
     comm.showLog("检测关闭所有弹窗")
     try {
         //新弹窗
@@ -17517,6 +17562,13 @@ function closeAllPop() {
         console.log(e)
     }
 }
+
+//关闭所有弹窗
+function closeAllPop() {
+    comm.showLog("检测关闭所有弹窗")
+    
+}
+
 function selectTkBirthday2() {
 
     //设置出生年月日
@@ -18636,13 +18688,14 @@ function menu() {
             comm.showLog("开启测试模式")
             test = true
             sleep(2000)
-            let email = "karilynmonroe1206@mailsdog.com";
+            let email = "8QKuCHXwIHR@houjiutu.com";
             let loginType = 1;
             let username = "karilynmonroe1206"
-            let password = "ec649a9d8c@96e2";
+            let password = "bYLLwcnJkqYFN";
             let vcode_url = "TQJIMQPIYXCHLO62IBUODGLSHBEV3S44";
             sleep(2000)
-            login(email, username, loginType, password, vcode_url)
+            // login(email, username, loginType, password, vcode_url)
+
             // login(email, username, loginType, password, vcode_url) == "success"
 
             // let email = "macaleb00@ttusmail.com";
@@ -18667,9 +18720,9 @@ function menu() {
 
             // let email = "7OwBjz8n734@houjiutu.com";
             // let password = "HH2gR5GqKQ48B";
-            // let nickname = ""
+            let nickname = ""
 
-            // register_google(email, password, nickname)
+            register_google(email, password, nickname)
 
             console.log("测试结束");
             break
@@ -22464,4 +22517,41 @@ function filterButtonByPosition(buttons, position) {
             throw new Error('Invalid position parameter');
     }
     return result;
+}
+
+
+function connectWebSocket() {
+    ws = $web.newWebSocket("ws://47.242.170.252:9000/ws?thirdApp=WHATSAPP&thirdAppUserId=1572223&device=VJPA10011017001_00&pluginVersion=333&envType=&channelId=&extra=", {
+        eventThread: 'this'
+    });
+    // ws = web.newWebSocket("ws://47.242.170.252:9000/ws?thirdApp=WHATSAPP&thirdAppUserId=1572223&device=VJPA10011017001_00&pluginVersion=333&envType=&channelId=&extra=");
+    ws.on("open", (res, ws) => {
+        log("WebSocket已连接");
+        connectState = true
+    }).on("failure", (err, res, ws) => {
+        log("WebSocket连接失败");
+        connectState = false
+        console.error(err);
+        setTimeout(() => {
+            console.log('尝试重连...');
+            ws = connectWebSocket();
+        }, 5000);
+    }).on("closing", (code, reason, ws) => {
+        log("WebSocket关闭，code=" + code + ",reason=" + reason + ",ws=" + ws);
+    }).on("text", (text, ws) => {
+        WSMessageProcessing(text)
+    }).on("binary", (bytes, ws) => {
+        console.info("收到二进制消息:");
+        console.info("hex: ", bytes.hex());
+        console.info("base64: ", bytes.base64());
+        console.info("md5: ", bytes.md5());
+        console.info("size: ", bytes.size());
+        console.info("bytes: ", bytes.toByteArray());
+    }).on("closed", (code, reason, ws) => { 
+        log("WebSocket已关闭: code = %d, reason = %s", code, reason);
+    });
+    // events.on("exit", function () {
+    //     ws.close(1000, "正常关闭")
+    // });
+    return ws
 }
