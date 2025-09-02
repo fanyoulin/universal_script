@@ -35,13 +35,13 @@ var test = false   //测试
 var tkShareString = ""  //tk老邀新活动复制的链接
 var account_id = 0
 //
-// var ws = connectWebSocket()
-// var connectState = false
+var ws = connectWebSocket()
+var connectState = false
 
 
-// setInterval(() => {
-//     ws.send('ping')
-// }, 15000);
+setInterval(() => {
+    ws.send('ping')
+}, 15000);
 
 
 importClass('java.net.Inet4Address');
